@@ -1,5 +1,6 @@
 #include <stdio.h>             // printf, fprintf, stderr
 #include <string.h>            // strlen, strcpy, strcmp
+#include <sys/wait.h>          // wait
 #include <stdlib.h>            // atoi
 #include <unistd.h>            // fork, execvp, pipe, dup2, close, STDIN_FILENO, STDOUT_FILENO
 #include <readline/readline.h> // readline
@@ -118,7 +119,7 @@ void executeArgs(char **parsed) // 接受字符串數組
         }
         exit(0);
     }
-    else // paren
+    else // parent
     {
         wait(NULL);
         return;
@@ -223,9 +224,18 @@ int cmdHandler(char **parsed)
     case 1: // cd [dir]
         if (parsed[1] == NULL)
         {
-            fprintf(stderr, "error: %s\n", "cd: missing argument");
+            // 如果沒有提供目錄名，則改為用戶的家目錄
+            char *homeDir = getenv("HOME");
+            if (homeDir == NULL)
+            {
+                fprintf(stderr, "error: %s\n", "cd: HOME not set");
+            }
+            else if (chdir(homeDir) != 0)
+            {
+                fprintf(stderr, "error: %s\n", "cd: fail to change to home directory");
+            }
         }
-        if (chdir(parsed[1]) != 0)
+        else if (chdir(parsed[1]) != 0)
         {
             fprintf(stderr, "error: %s\n", "cd: fail to change directory");
         }
@@ -289,7 +299,8 @@ int main()
     {
         signal(SIGINT, signalHandler);
         // take input
-        printDir();
+        // printDir();
+        printf("\n");
         if (Input(inputString))
         {
             continue;

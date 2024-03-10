@@ -15,7 +15,7 @@
 int Input(char *str)
 {
     char *buffer;
-    buffer = readline("\n$ "); // read a line from the user
+    buffer = readline("\n$"); // read a line from the user
     if (strlen(buffer) != 0)
     {
         add_history(buffer);
@@ -34,7 +34,6 @@ void signalHandler(int sigNum)
 {
     signal(SIGINT, signalHandler);
     fflush(stdout);
-    printf("\nTerminating the shell...\n"); // 提醒用戶 shell 正在終止
     exit(0);
 }
 
@@ -299,8 +298,7 @@ int main()
     {
         signal(SIGINT, signalHandler);
         // take input
-        // printDir();
-        printf("\n");
+        printDir();
         if (Input(inputString))
         {
             continue;
@@ -318,15 +316,6 @@ int main()
         {
             execArgsPiped(parsedArgs, execFlag - 1);
         }
-    }
-
-    for (int i = 0; parsedArgs[i] != NULL; i++)
-    {
-        free(parsedArgs[i]);
-    }
-    for (int i = 0; parsedArgsPiped[i] != NULL; i++)
-    {
-        free(parsedArgsPiped[i]);
     }
 
     return 0;
